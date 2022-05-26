@@ -1,5 +1,21 @@
-import {execa} from 'execa';
-import fs from 'fs';
+// TLD Scanner
+// License: MIT
+// Usage:
+//  
+//      Basic scan:
+//      node scan.js {search} {args}
+//      
+//      EG:
+//      node scan.js piffle
+//
+//      Args:
+//      -u          Unicode TLDs only
+//      -f {file}   File of TLDs to use
+
+
+const execa = require('execa')
+const fs = require('fs');
+
 if(process.argv.length < 3) {
     throw "Must supply one domain!";
 }
@@ -1658,21 +1674,32 @@ const tlduni = [
 
 let yes = []
 
-for(let i = 0; i < tlds.length; i++){
-    let whois = execa('whois', [domain + '.' + tlds[i]])
-    whois.stdout.on('data', (data) => {
-        let d = data.toString()
-        if(d.match(/No match for domain/)  || d.match(/Domain not found/) || d.match(/No entries found/)){
-            console.log(domain + "." + tlds[i] + ": AVAILABLE ✅")
-            yes[yes.length + 1] = domain + "." + tlds[i]
-        } else {
-            console.log(domain + "." + tlds[i] + ": UNAVAILABLE")
-        }
-    })
-    await sleep(100)
+async function scan(tlds){
+    for(let i = 0; i < tlds.length; i++){
+        let whois = execa('whois', [domain + '.' + tlds[i]])
+        whois.stdout.on('data', (data) => {
+            let d = data.toString()
+            if(d.match(/No match for domain/)  || d.match(/Domain not found/) || d.match(/No entries found/)){
+                console.log(domain + "." + tlds[i] + ": AVAILABLE ✅")
+                yes[yes.length + 1] = domain + "." + tlds[i]
+            } else {
+                console.log(domain + "." + tlds[i] + ": UNAVAILABLE")
+            }
+        })
+        await sleep(100)
+    }
+}
+
+if(process.argv[3]  == '-u'){
+    scan(tlduni);
+} else {
+    scan(tlds)
 }
 
 console.log("==================================================")
 console.log("         AVAILABLE TLDS SAVED TO TLDS.TXT         ")
 console.log("==================================================")
-fs.writeFileSync('/tlds.txt',yes)
+let file = fs.createWriteStream('TLDS.txt');
+file.on('error', function(err) { process.exit(1) });
+yes.forEach(function(v) { file.write(v.join(', ') + '\n'); });
+file.end();
