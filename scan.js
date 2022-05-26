@@ -13,8 +13,8 @@
 //      -f {file}   File of TLDs to use
 
 
-const execa = require('execa')
-const fs = require('fs');
+import {execa} from 'execa';
+import fs from 'fs';
 
 if(process.argv.length < 3) {
     throw "Must supply one domain!";
@@ -1672,9 +1672,9 @@ const tlduni = [
 "XN--ZFR164B",
 ]
 
-let yes = []
 
 async function scan(tlds){
+    let yes = []
     for(let i = 0; i < tlds.length; i++){
         let whois = execa('whois', [domain + '.' + tlds[i]])
         whois.stdout.on('data', (data) => {
@@ -1688,6 +1688,14 @@ async function scan(tlds){
         })
         await sleep(100)
     }
+
+    console.log("==================================================")
+    console.log("         AVAILABLE TLDS SAVED TO TLDS.TXT         ")
+    console.log("==================================================")
+    let file = fs.createWriteStream('TLDS.txt');
+    file.on('error', function(err) { process.exit(1) });
+    yes.forEach(function(v) { file.write(v.join(', ') + '\n'); });
+    file.end();
 }
 
 if(process.argv[3]  == '-u'){
@@ -1695,11 +1703,3 @@ if(process.argv[3]  == '-u'){
 } else {
     scan(tlds)
 }
-
-console.log("==================================================")
-console.log("         AVAILABLE TLDS SAVED TO TLDS.TXT         ")
-console.log("==================================================")
-let file = fs.createWriteStream('TLDS.txt');
-file.on('error', function(err) { process.exit(1) });
-yes.forEach(function(v) { file.write(v.join(', ') + '\n'); });
-file.end();
