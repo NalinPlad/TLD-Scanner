@@ -1679,7 +1679,7 @@ async function scan(tlds){
         let whois = execa('whois', [domain + '.' + tlds[i]])
         whois.stdout.on('data', (data) => {
             let d = data.toString()
-            if(d.match(/No match for domain/)  || d.match(/Domain not found/) || d.match(/No entries found/)){
+            if(d.match(/No match for domain/)  || d.match(/Domain not found/) || d.match(/No entries found/ || d.match(/This domain name has not been registered/) || d.match(/No Data Found/))){
                 console.log(domain + "." + tlds[i] + ": AVAILABLE ✅")
                 yes[yes.length + 1] = domain + "." + tlds[i]
             } else {
