@@ -15,6 +15,7 @@
 
 import {execa} from 'execa';
 import fs from 'fs';
+import http from 'http';
 
 if(process.argv.length < 3) {
     throw "Must supply one domain!";
@@ -24,6 +25,7 @@ async function sleep(millis) {
     return new Promise(resolve => setTimeout(resolve, millis));
 }
 
+const tldSrc = "http://data.iana.org/TLD/tlds-alpha-by-domain.txt";
 const domain = process.argv[2]
 
 const tlds = [
@@ -1517,7 +1519,7 @@ const tlds = [
 ]
 
 const tlduni = [
-"XN--11B4C3D",
+    "XN--11B4C3D",
 "XN--1CK2E1B",
 "XN--1QQW23A",
 "XN--2SCRJ9C",
@@ -1671,7 +1673,6 @@ const tlduni = [
 "XN--YGBI2AMMX",
 "XN--ZFR164B",
 ]
-
 
 async function scan(tlds){
     let yes = []
