@@ -1698,7 +1698,7 @@ async function scan(tlds){
     file.end();
 }
 
-if(process.argv[3]  == '-u'){
+if(process.argv.includes('-u')){
     scan(tlduni);
 } else {
     scan(tlds)
