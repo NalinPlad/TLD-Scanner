@@ -1677,7 +1677,7 @@ async function scan(tlds){
     let yes = []
     for(let i = 0; i < tlds.length; i++){
         let whois = execa('whois', [domain + '.' + tlds[i]])
-        whois.stdout.on('data', (data) => {
+        await whois.stdout.on('data', (data) => {
             let d = data.toString()
             if(d.match(/No match for domain/)  || d.match(/Domain not found/) || d.match(/No entries found/)){
                 console.log(domain + "." + tlds[i] + ": AVAILABLE ✅")
@@ -1689,12 +1689,12 @@ async function scan(tlds){
         await sleep(100)
     }
 
-    console.log("==================================================")
-    console.log("         AVAILABLE TLDS SAVED TO TLDS.TXT         ")
-    console.log("==================================================")
-    let file = fs.createWriteStream('TLDS.txt');
+    console.log("==============================================(*)")
+    console.log(`AVAILABLE TLDS ARE SAVED TO ${domain}.TXT`)
+    console.log("==============================================(*)")
+    let file = fs.createWriteStream(domain + '.txt');
     file.on('error', function(err) { process.exit(1) });
-    yes.forEach(function(v) { file.write(v.join(', ') + '\n'); });
+    yes.forEach(function(v) { file.write(v + '\n'); });
     file.end();
 }
 
